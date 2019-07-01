@@ -1,15 +1,23 @@
 const express = require('express');
 const { postgraphile } = require('postgraphile');
-// const PgSimplifyInflectorPlugin = require('@graphile-contrib/pg-simplify-inflector');
+const { express: voyagerMiddleware } = require('graphql-voyager/middleware');
 
 const app = express();
-const schema_name = 'public';
-const database = 'postgres://jackdwyer@localhost:5432/juke';
+
+const schemaName = 'public';
+const databaseName = 'juke';
+const username = 'jackdwyer';
+const database =
+  process.env.DATABASE_URL ||
+  `postgres://${username}:@localhost:5432/${databaseName}`;
 const pglConfig = {
   watchPg: true,
   graphiql: true,
   enhanceGraphiql: true,
 };
-app.use(postgraphile(database, schema_name, pglConfig));
+
+app.use(postgraphile(database, schemaName, pglConfig));
+
+app.use('/voyager', voyagerMiddleware({ endpointUrl: '/graphql' }));
 
 app.listen(5000);
